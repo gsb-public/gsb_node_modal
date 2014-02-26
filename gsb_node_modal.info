@@ -1,0 +1,4 @@
+name = GSB Node Modal
+package = GSB
+core = 7.x
+dependencies[] = ctools
