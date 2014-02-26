@@ -1,0 +1,153 @@
+<?php
+
+/**
+ * @file gsb_node_modal.module
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function gsb_node_modal_menu() {
+  $items = array();
+
+  $items['gsb-node/%ctools_js/add/%'] = array(
+    'title' => 'Create new node',
+    'page callback' => 'gsb_modal_node_add',
+    'page arguments' => array(1, 3),
+    'access callback' => 'node_access',
+    'access arguments' => array('create', 3),
+  );
+  $items['gsb-node/%ctools_js/edit/%node'] = array(
+    'title callback' => 'node_page_title',
+    'title arguments' => array(3),
+    'page callback' => 'gsb_modal_node_edit',
+    'page arguments' => array(1, 3),
+    'access callback' => 'node_access',
+    'access arguments' => array('update', 3),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function gsb_node_modal_admin_paths() {
+  $paths = array();
+  if (variable_get('node_admin_theme')) {
+    $paths['gsb-node/*/add/*'] = TRUE;
+    $paths['gsb-node/*/edit/*'] = TRUE;
+  }
+  return $paths;
+}
+
+/**
+ * Provides the node add form in a modal.
+ */
+function gsb_modal_node_add($js, $type) {
+  global $user;
+
+  $types = node_type_get_types();
+  drupal_set_title(t('Create @name', array('@name' => $types[$type]->name)), PASS_THROUGH);
+
+  $node = (object) array(
+    'uid' => $user->uid,
+    'name' => (isset($user->name) ? $user->name : ''),
+    'type' => $type,
+    'language' => LANGUAGE_NONE,
+  );
+
+  $form_state['ajax'] = $js;
+  $form_state['build_info']['args'] = array($node);
+  form_load_include($form_state, 'inc', 'node', 'node.pages');
+  ctools_include('modal');
+  $output = ctools_modal_form_wrapper($type . '_node_form', $form_state);
+  if (!$js) {
+    return $output;
+  }
+
+  $commands = $output;
+  if (!empty($form_state['executed'])) {
+    ctools_include('ajax');
+    $commands = array(
+      ctools_modal_command_dismiss(),
+    );
+  }
+  print ajax_render($commands);
+  exit();
+}
+
+/**
+ * Provides the node add form in a modal.
+ */
+function gsb_modal_node_edit($js, $node) {
+  $type_name = node_type_get_name($node);
+  drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $type_name, '@title' => $node->title)), PASS_THROUGH);
+
+  $form_state['ajax'] = $js;
+  $form_state['build_info']['args'] = array($node);
+  form_load_include($form_state, 'inc', 'node', 'node.pages');
+  ctools_include('modal');
+  $output = ctools_modal_form_wrapper($node->type . '_node_form', $form_state);
+  if (!$js) {
+    return $output;
+  }
+
+  $commands = $output;
+  if (!empty($form_state['executed'])) {
+    ctools_include('ajax');
+    $commands = array(
+      ctools_modal_command_dismiss(),
+    );
+  }
+  print ajax_render($commands);
+  exit();
+}
+
+/**
+ * Creates a link to open a node add form in a modal.
+ *
+ * @param string $text
+ *   The translated text to use for the link.
+ * @param string $type
+ *   The machine name of the content type.
+ *
+ * @return string
+ *   The link to open a node add form in a modal.
+ */
+function gsb_modal_node_add_link($text, $type) {
+  return _gsb_modal_node_link($text, 'gsb-node/nojs/add/' . $type);
+}
+
+/**
+ * Creates a link to open a node edit form in a modal.
+ *
+ * @param string $text
+ *   The translated text to use for the link.
+ * @param int $nid
+ *   The node ID to edit.
+ *
+ * @return string
+ *   The link to open a node edit form in a modal.
+ */
+function gsb_modal_node_edit_link($text, $nid) {
+  return _gsb_modal_node_link($text, 'gsb-node/nojs/edit/' . $nid);
+}
+
+/**
+ * Helper function for creating a modal link.
+ *
+ * @param string $text
+ *   The translated text to use for the link.
+ * @param string $url
+ *   The URL for the link.
+ *
+ * @return string
+ *   The link.
+ */
+function _gsb_modal_node_link($text, $url) {
+  ctools_include('ajax');
+  ctools_include('modal');
+  ctools_modal_add_js();
+  return ctools_modal_text_button($text, $url, $text);
+}
