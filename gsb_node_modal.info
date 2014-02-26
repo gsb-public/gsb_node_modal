@@ -1,4 +1,5 @@
 name = GSB Node Modal
+description = Provide node add and edit forms via a modal.
 package = GSB
 core = 7.x
 dependencies[] = ctools
