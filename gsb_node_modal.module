@@ -151,3 +151,27 @@ function _gsb_node_modal_link($text, $url) {
   ctools_modal_add_js();
   return ctools_modal_text_button($text, $url, $text);
 }
+
+/**
+ * Implements hook_views_api().
+ */
+function gsb_node_modal_views_api() {
+  return array(
+    'api' => 3,
+  );
+}
+
+/**
+ * Implements hook_views_data().
+ */
+function gsb_node_modal_views_data() {
+  $data = array();
+  $data['views_entity_node']['edit_node_modal'] = array(
+    'field' => array(
+      'title' => t('Edit link (in modal)'),
+      'help' => t('Provide a link to edit the content in a modal.'),
+      'handler' => 'gsb_node_modal_handler_field_node_link_edit',
+    ),
+  );
+  return $data;
+}

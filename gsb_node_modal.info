@@ -3,3 +3,5 @@ description = Provide node add and edit forms via a modal.
 package = GSB
 core = 7.x
 dependencies[] = ctools
+
+files[] = gsb_node_modal_handler_field_node_link_edit.inc
