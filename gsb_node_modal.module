@@ -47,8 +47,8 @@ function gsb_node_modal_admin_paths() {
 function gsb_node_modal_add($js, $type) {
   global $user;
 
-  $types = node_type_get_types();
-  drupal_set_title(t('Create @name', array('@name' => $types[$type]->name)), PASS_THROUGH);
+  $type_name = node_type_get_name($type);
+  drupal_set_title(t('Create @name', array('@name' => $type_name)), PASS_THROUGH);
 
   $node = (object) array(
     'uid' => $user->uid,
@@ -57,24 +57,7 @@ function gsb_node_modal_add($js, $type) {
     'language' => LANGUAGE_NONE,
   );
 
-  $form_state['ajax'] = $js;
-  $form_state['build_info']['args'] = array($node);
-  form_load_include($form_state, 'inc', 'node', 'node.pages');
-  ctools_include('modal');
-  $output = ctools_modal_form_wrapper($type . '_node_form', $form_state);
-  if (!$js) {
-    return $output;
-  }
-
-  $commands = $output;
-  if (!empty($form_state['executed'])) {
-    ctools_include('ajax');
-    $commands = array(
-      ctools_modal_command_dismiss(),
-    );
-  }
-  print ajax_render($commands);
-  exit();
+  return _gsb_node_modal_helper($js, $node);
 }
 
 /**
@@ -84,6 +67,22 @@ function gsb_node_modal_edit($js, $node) {
   $type_name = node_type_get_name($node);
   drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $type_name, '@title' => $node->title)), PASS_THROUGH);
 
+  return _gsb_node_modal_helper($js, $node);
+}
+
+/**
+ * Returns a modal node form.
+ *
+ * @param bool $js
+ *   TRUE if this is an AJAX form, FALSE otherwise.
+ * @param object $node
+ *   The node object
+ *
+ * @return array|null
+ *   If $js is FALSE, the form array. Otherwise, the content will be output
+ *   directly and exit() is called.
+ */
+function _gsb_node_modal_helper($js, $node) {
   $form_state['ajax'] = $js;
   $form_state['build_info']['args'] = array($node);
   form_load_include($form_state, 'inc', 'node', 'node.pages');
@@ -99,6 +98,9 @@ function gsb_node_modal_edit($js, $node) {
     $commands = array(
       ctools_modal_command_dismiss(),
     );
+    if ($messages = theme('status_messages')) {
+      $commands[] = ajax_command_append('#console', $messages);
+    }
   }
   print ajax_render($commands);
   exit();
