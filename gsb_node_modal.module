@@ -173,5 +173,15 @@ function gsb_node_modal_views_data() {
       'handler' => 'gsb_node_modal_handler_field_node_link_edit',
     ),
   );
+
+  $data['gsb__global']['table']['group'] = t('GSB');
+  $data['gsb__global']['table']['join']['#global'] = array();
+  $data['gsb__global']['gsb_node_modal_add_link'] = array(
+    'title' => t('Modal node add link'),
+    'help' => t('Displays a link to create a new node in a modal.'),
+    'area' => array(
+      'handler' => 'gsb_node_modal_handler_area_node_add_link',
+    ),
+  );
   return $data;
 }
