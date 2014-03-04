@@ -95,12 +95,18 @@ function _gsb_node_modal_helper($js, $node) {
   $commands = $output;
   if (!empty($form_state['executed'])) {
     ctools_include('ajax');
-    $commands = array(
-      ctools_modal_command_dismiss(),
-    );
+    ctools_add_js('gsb_node_modal', 'gsb_node_modal');
+    $commands = array();
+    // If there are status messages, print them.
     if ($messages = theme('status_messages')) {
       $commands[] = ajax_command_append('#console', $messages);
     }
+    // Reload the view.
+    $commands[] = array(
+      'command' => 'gsb_node_modal_reload',
+    );
+    // Close the modal.
+    $commands[] = ctools_modal_command_dismiss();
   }
   print ajax_render($commands);
   exit();
