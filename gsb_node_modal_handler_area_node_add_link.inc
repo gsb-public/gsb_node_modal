@@ -22,6 +22,8 @@ class gsb_node_modal_handler_area_node_add_link extends views_handler_area {
       'default' => '',
       'translatable' => TRUE,
     );
+    // Set the default to TRUE so it shows on empty pages by default.
+    $options['empty']['default'] = TRUE;
     return $options;
   }
 
