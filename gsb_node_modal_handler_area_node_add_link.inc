@@ -13,6 +13,13 @@ class gsb_node_modal_handler_area_node_add_link extends views_handler_area {
   /**
    * {@inheritdoc}
    */
+  public function access() {
+    return $this->isLinkConfigured() ? user_access('create ' . $this->options['bundle'] . ' content') : FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function option_definition() {
     $options = parent::option_definition();
     $options['bundle'] = array(
@@ -67,7 +74,8 @@ class gsb_node_modal_handler_area_node_add_link extends views_handler_area {
    * {@inheritdoc}
    */
   public function render($empty = FALSE) {
-    if ($this->isLinkConfigured()) {
+    // @todo Remove access check once the access() method is respected.
+    if ($this->isLinkConfigured() && $this->access()) {
       return gsb_node_modal_add_link($this->options['text'], $this->options['bundle']);
     }
   }
