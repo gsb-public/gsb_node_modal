@@ -44,7 +44,7 @@ function gsb_node_modal_admin_paths() {
 /**
  * Provides the node add form in a modal.
  */
-function gsb_node_modal_add($js, $type) {
+function gsb_node_modal_add($js, $type, $parent_node = NULL) {
   global $user;
 
   $type_name = node_type_get_name($type);
@@ -55,6 +55,7 @@ function gsb_node_modal_add($js, $type) {
     'name' => (isset($user->name) ? $user->name : ''),
     'type' => $type,
     'language' => LANGUAGE_NONE,
+    'gsb_parent_node' => $parent_node,
   );
 
   return _gsb_node_modal_helper($js, $node);
@@ -114,12 +115,19 @@ function _gsb_node_modal_helper($js, $node) {
  *   The translated text to use for the link.
  * @param string $type
  *   The machine name of the content type.
+ * @param int $nid
+ *   (optional) The node ID of the parent node.
  *
  * @return string
  *   The link to open a node add form in a modal.
  */
-function gsb_node_modal_add_link($text, $type) {
-  return _gsb_node_modal_link($text, 'gsb-node/nojs/add/' . $type);
+function gsb_node_modal_add_link($text, $type, $nid = NULL) {
+  $link = 'gsb-node/nojs/add/' . $type;
+  // If a parent node was specified, append it to the link.
+  if ($nid) {
+    $link .= '/' . $nid;
+  }
+  return _gsb_node_modal_link($text, $link);
 }
 
 /**
