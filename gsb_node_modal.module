@@ -86,6 +86,8 @@ function gsb_node_modal_edit($js, $node) {
 function _gsb_node_modal_helper($js, $node) {
   $form_state['ajax'] = $js;
   $form_state['build_info']['args'] = array($node);
+  // Prevent the HTML IDs from being incremented.
+  $form_state['reset_html_ids'] = TRUE;
   form_load_include($form_state, 'inc', 'node', 'node.pages');
   ctools_include('modal');
   $output = ctools_modal_form_wrapper($node->type . '_node_form', $form_state);
