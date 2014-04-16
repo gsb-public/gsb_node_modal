@@ -96,7 +96,9 @@ function _gsb_node_modal_helper($js, $node) {
   }
 
   $commands = $output;
-  if (!empty($form_state['executed'])) {
+  // If a button executes the form but also flags the form to be rebuilt, do not
+  // treat it as an actual form submission, and do not close the modal.
+  if (!empty($form_state['executed']) && !$form_state['rebuild']) {
     ctools_include('ajax');
     ctools_add_js('gsb_node_modal', 'gsb_node_modal');
     $commands = array();
