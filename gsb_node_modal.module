@@ -84,13 +84,26 @@ function gsb_node_modal_edit($js, $node) {
  *   directly and exit() is called.
  */
 function _gsb_node_modal_helper($js, $node) {
+  $form_id = $node->type . '_node_form';
   $form_state['ajax'] = $js;
   $form_state['build_info']['args'] = array($node);
-  // Prevent the HTML IDs from being incremented.
-  $form_state['reset_html_ids'] = TRUE;
   form_load_include($form_state, 'inc', 'node', 'node.pages');
+
+  // If this form was already submitted, track the used HTML IDs.
+  if (!empty($_POST['form_build_id'])) {
+    list($ajax_form, $ajax_form_state, $ajax_form_id) = ajax_get_form();
+    if ($form_id == $ajax_form_id && !empty($ajax_form_state['ajax_html_ids'])) {
+      $_POST['ajax_html_ids'] = $ajax_form_state['ajax_html_ids'];
+    }
+  }
+
+  // If the HTML IDs are being tracked, store them in the form state.
+  if (!empty($_POST['ajax_html_ids'])) {
+    $form_state['ajax_html_ids'] = $_POST['ajax_html_ids'];
+  }
+
   ctools_include('modal');
-  $output = ctools_modal_form_wrapper($node->type . '_node_form', $form_state);
+  $output = ctools_modal_form_wrapper($form_id, $form_state);
   if (!$js) {
     return $output;
   }
