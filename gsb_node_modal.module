@@ -117,7 +117,7 @@ function _gsb_node_modal_helper($js, $node) {
     $commands = array();
     // If there are status messages, print them.
     if ($messages = theme('status_messages')) {
-      $commands[] = ajax_command_append('#console', $messages);
+      $commands[] = ajax_command_html('#console', $messages);
     }
     // Reload the view.
     $commands[] = array(
