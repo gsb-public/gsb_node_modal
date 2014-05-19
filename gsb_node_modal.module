@@ -103,6 +103,7 @@ function gsb_node_modal_delete($js, $node) {
  *   directly and exit() is called.
  */
 function _gsb_node_modal_helper($form_id, $js, $node) {
+  $form_state['gsb_node_modal'] = TRUE;
   $form_state['ajax'] = $js;
   $form_state['build_info']['args'] = array($node);
   // Set cache to TRUE so we can process it for AJAX submissions later.
@@ -148,6 +149,15 @@ function _gsb_node_modal_helper($form_id, $js, $node) {
   }
   print ajax_render($commands);
   exit();
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for node_form.
+ */
+function gsb_node_modal_form_node_form_alter(&$form, &$form_state, $form_id) {
+  if (!empty($form_state['gsb_node_modal']) && isset($form['actions']['delete'])) {
+    $form['actions']['delete']['#access'] = FALSE;
+  }
 }
 
 /**
