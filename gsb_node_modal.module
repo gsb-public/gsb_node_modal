@@ -25,6 +25,13 @@ function gsb_node_modal_menu() {
     'access callback' => 'node_access',
     'access arguments' => array('update', 3),
   );
+  $items['gsb-node/%ctools_js/delete/%node'] = array(
+    'title' => 'Delete node',
+    'page callback' => 'gsb_node_modal_delete',
+    'page arguments' => array(1, 3),
+    'access callback' => 'node_access',
+    'access arguments' => array('delete', 3),
+  );
 
   return $items;
 }
@@ -37,6 +44,7 @@ function gsb_node_modal_admin_paths() {
   if (variable_get('node_admin_theme')) {
     $paths['gsb-node/*/add/*'] = TRUE;
     $paths['gsb-node/*/edit/*'] = TRUE;
+    $paths['gsb-node/*/delete/*'] = TRUE;
   }
   return $paths;
 }
@@ -58,22 +66,33 @@ function gsb_node_modal_add($js, $type, $parent_node = NULL) {
     'gsb_parent_node' => $parent_node,
   );
 
-  return _gsb_node_modal_helper($js, $node);
+  $form_id = $type . '_node_form';
+  return _gsb_node_modal_helper($form_id, $js, $node);
 }
 
 /**
- * Provides the node add form in a modal.
+ * Provides the node edit form in a modal.
  */
 function gsb_node_modal_edit($js, $node) {
   $type_name = node_type_get_name($node);
   drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $type_name, '@title' => $node->title)), PASS_THROUGH);
 
-  return _gsb_node_modal_helper($js, $node);
+  $form_id = $node->type . '_node_form';
+  return _gsb_node_modal_helper($form_id, $js, $node);
+}
+
+/**
+ * Provides the node delete form in a modal.
+ */
+function gsb_node_modal_delete($js, $node) {
+  return _gsb_node_modal_helper('node_delete_confirm', $js, $node);
 }
 
 /**
  * Returns a modal node form.
  *
+ * @param string $form_id
+ *   The form ID to render in the modal.
  * @param bool $js
  *   TRUE if this is an AJAX form, FALSE otherwise.
  * @param object $node
@@ -83,8 +102,7 @@ function gsb_node_modal_edit($js, $node) {
  *   If $js is FALSE, the form array. Otherwise, the content will be output
  *   directly and exit() is called.
  */
-function _gsb_node_modal_helper($js, $node) {
-  $form_id = $node->type . '_node_form';
+function _gsb_node_modal_helper($form_id, $js, $node) {
   $form_state['ajax'] = $js;
   $form_state['build_info']['args'] = array($node);
   // Set cache to TRUE so we can process it for AJAX submissions later.
@@ -206,6 +224,13 @@ function gsb_node_modal_views_data() {
       'title' => t('Edit link (in modal)'),
       'help' => t('Provide a link to edit the content in a modal.'),
       'handler' => 'gsb_node_modal_handler_field_node_link_edit',
+    ),
+  );
+  $data['views_entity_node']['delete_node_modal'] = array(
+    'field' => array(
+      'title' => t('Delete link (in modal)'),
+      'help' => t('Provide a link to delete the content in a modal.'),
+      'handler' => 'gsb_node_modal_handler_field_node_link_delete',
     ),
   );
 
