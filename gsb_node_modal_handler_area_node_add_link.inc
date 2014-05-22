@@ -74,8 +74,7 @@ class gsb_node_modal_handler_area_node_add_link extends views_handler_area {
    * {@inheritdoc}
    */
   public function render($empty = FALSE) {
-    // @todo Remove access check once the access() method is respected.
-    if ($this->isLinkConfigured() && $this->access()) {
+    if ($this->isLinkConfigured()) {
       return gsb_node_modal_add_link($this->options['text'], $this->options['bundle'], reset($this->view->args));
     }
   }
