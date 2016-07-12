@@ -25,6 +25,14 @@ function gsb_node_modal_menu() {
     'access callback' => 'node_access',
     'access arguments' => array('update', 3),
   );
+  $items['gsb-node/%ctools_js/%node/clone/confirm'] = array(
+    'title callback' => 'node_page_title',
+    'title arguments' => array(2),
+    'page callback' => 'gsb_node_modal_clone',
+    'page arguments' => array(1, 2),
+    'access callback' => 'node_access',
+    'access arguments' => array('create', 2),
+  );
   $items['gsb-node/%ctools_js/delete/%node'] = array(
     'title' => 'Delete node',
     'page callback' => 'gsb_node_modal_delete',
@@ -44,6 +52,7 @@ function gsb_node_modal_admin_paths() {
   if (variable_get('node_admin_theme')) {
     $paths['gsb-node/*/add/*'] = TRUE;
     $paths['gsb-node/*/edit/*'] = TRUE;
+    $paths['gsb-node/*/clone/confirm'] = TRUE;
     $paths['gsb-node/*/delete/*'] = TRUE;
   }
   return $paths;
@@ -76,7 +85,16 @@ function gsb_node_modal_add($js, $type, $parent_node = NULL) {
 function gsb_node_modal_edit($js, $node) {
   $type_name = node_type_get_name($node);
   drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $type_name, '@title' => $node->title)), PASS_THROUGH);
+  $form_id = $node->type . '_node_form';
+  return _gsb_node_modal_helper($form_id, $js, $node);
+}
 
+/**
+ * Provides the node clone form in a modal.
+ */
+function gsb_node_modal_clone($js, $node) {
+  $type_name = node_type_get_name($node);
+  drupal_set_title(t('<em>Clone @type</em> @title', array('@type' => $type_name, '@title' => $node->title)), PASS_THROUGH);
   $form_id = $node->type . '_node_form';
   return _gsb_node_modal_helper($form_id, $js, $node);
 }
@@ -198,6 +216,21 @@ function gsb_node_modal_edit_link($text, $nid) {
 }
 
 /**
+ * Creates a link to open a node clone form in a modal.
+ *
+ * @param string $text
+ *   The translated text to use for the link.
+ * @param int $nid
+ *   The node ID to clone.
+ *
+ * @return string
+ *   The link to open a node edit form in a modal.
+ */
+function gsb_node_modal_clone_link($text, $nid) {
+ // return _gsb_node_modal_link($text, 'gsb-node/nojs/clone/' . $nid);
+  return _gsb_node_modal_link($text, 'gsb-node/nojs/'. $nid . '/clone/confirm' );
+}
+/**
  * Helper function for creating a modal link.
  *
  * @param string $text
@@ -234,6 +267,13 @@ function gsb_node_modal_views_data() {
       'title' => t('Edit link (in modal)'),
       'help' => t('Provide a link to edit the content in a modal.'),
       'handler' => 'gsb_node_modal_handler_field_node_link_edit',
+    ),
+  );
+  $data['views_entity_node']['clone_node_modal'] = array(
+    'field' => array(
+      'title' => t('Clone link (in modal)'),
+      'help' => t('Provide a link to clone the content in a modal.'),
+      'handler' => 'gsb_node_modal_handler_field_node_link_clone',
     ),
   );
   $data['views_entity_node']['delete_node_modal'] = array(
