@@ -93,10 +93,14 @@ function gsb_node_modal_edit($js, $node) {
  * Provides the node clone form in a modal.
  */
 function gsb_node_modal_clone($js, $node) {
-  $type_name = node_type_get_name($node);
-  drupal_set_title(t('<em>Clone @type</em> @title', array('@type' => $type_name, '@title' => $node->title)), PASS_THROUGH);
-  $form_id = $node->type . '_node_form';
-  return _gsb_node_modal_helper($form_id, $js, $node);
+
+  include_once DRUPAL_ROOT . '/profiles/gsb_public/modules/contrib/node_clone/clone.pages.inc';
+
+  $cloned_node = _clone_node_prepare($node, TRUE);
+  $type_name = node_type_get_name($cloned_node);
+  drupal_set_title(t('<em>Clone @type</em> @title', array('@type' => $type_name, '@title' => $cloned_node->title)), PASS_THROUGH);
+  $form_id = $cloned_node->type . '_node_form';
+  return _gsb_node_modal_helper($form_id, $js, $cloned_node);
 }
 
 /**
